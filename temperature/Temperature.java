@@ -14,9 +14,9 @@ public class Temperature extends Configured implements Tool {
   public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
 
   	// These are the keys, values
-  	// One is the value
+  	// temp is the value
 		private IntWritable temp = new IntWritable();
-		// word is the key
+		// year is the key
 		private Text year = new Text();
 
 		public void configure(JobConf job) {
@@ -26,29 +26,26 @@ public class Temperature extends Configured implements Tool {
 		public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
 	    // Takes a line of input and makes it a string
 	    String line = value.toString();
+      // This tells us that the temperature measurement was valid
       String[] ACCURACY = new String[] {"0","1","4","5","9"};
 
+      // Sets the year key
       year.set(line.substring(15,19));
 
+      // Checks for missing values (9999) or valid measurements
       if (line.substring(88,92).equals("9999") || !(Arrays.asList(ACCURACY).contains(line.substring(92,93)))) {
+        // If invalid, sets sentinel value
         temp.set(-9999);
+      // If +xxxx, takes last four numeric values
       } else if (line.substring(87,88).equals("+")) {
         temp.set(Integer.parseInt(line.substring(88,92)));
+      // Otherwise takes -xxxx
       } else {
         temp.set(Integer.parseInt(line.substring(87,92)));
       }
 
+      // Collects key, value
       output.collect(year, temp);
-	    // Turns the string into discrete tokens
-	    // StringTokenizer tokenizer = new StringTokenizer(line);
-	    // Loops through tokens
-	    // while (tokenizer.hasMoreTokens()) {
-				// Sets the key to the next token
-				// word.set(tokenizer.nextToken());
-				// Sets the output to the token, and a value of one
-				// output.collect(word, one);
-	    // }
-	  // finishes the loop and the mapping
 		}
   }
 
@@ -57,9 +54,12 @@ public class Temperature extends Configured implements Tool {
 
 		// This is the reduce function
 		public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
-	  	// int max = Collections.max(values);
-      // Sets initial max to -9999
+	  	// This line does not work
+      // int max = Collections.max(values);
+
+      // Sets initial max to -9000
       int max = -9000;
+      // Loops through values, checks if it is larger than the present max, and if so sets it to the new max
       while (values.hasNext()) {
         int current = values.next().get();
         if (current > max) {
@@ -67,14 +67,7 @@ public class Temperature extends Configured implements Tool {
         }
       }
 
-      // Sets initial sum to zero
-	    // int sum = 0;
-	    // Loops through list of values
-	    // while (values.hasNext()) {
-	    	// Adds each value to the preexisting sum
-				// sum += values.next().get();
-	    // }
-	    // Collects each key and the corresponding sum
+	    // Collects each key and the corresponding max
 	    output.collect(key, new IntWritable(max));
 		}
   }
