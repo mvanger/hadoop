@@ -77,7 +77,11 @@ public class Temperature extends Configured implements Tool {
 		JobConf conf = new JobConf(getConf(), Temperature.class);
 		conf.setJobName("temperature");
 
-		// Sets classes of keys, values
+    // Sets classes of keys, values (Mapper Output)
+    // conf.setMapOutputKeyClass(IntWritable.class)
+		// conf.setMapOutputValueClass(Text.class)
+
+    // Sets classes of keys, values (Reducer Output)
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(IntWritable.class);
 
