@@ -50,18 +50,18 @@ public class Music2 extends Configured implements Tool {
 
       //if the artist is a <= artist <= e, assign partition 1, etc
       if (artist.charAt(0) >= 'a' && artist.charAt(0) <= 'e'){
-        return 1 % numReduceTasks;
+        return 0 % numReduceTasks;
       } else if (artist.charAt(0) > 'e' && artist.charAt(0) <= 'j') {
-        return 2 % numReduceTasks;
+        return 1 % numReduceTasks;
       } else if (artist.charAt(0) > 'j' && artist.charAt(0) <= 'o') {
-        return 3 % numReduceTasks;
+        return 2 % numReduceTasks;
       } else if (artist.charAt(0) > 'o' && artist.charAt(0) <= 't') {
-        return 4 % numReduceTasks;
+        return 3 % numReduceTasks;
       } else if (artist.charAt(0) > 't' && artist.charAt(0) <= 'z') {
-        return 5 % numReduceTasks;
+        return 4 % numReduceTasks;
       } else {
         // set other stuff (numbers, random characters) to first partition
-        return 1 % numReduceTasks;
+        return 0 % numReduceTasks;
       }
     }
 
@@ -107,6 +107,7 @@ public class Music2 extends Configured implements Tool {
 
     // Set partitioner class
     // In $ hadoop jar ... add "-D mapred.reduce.tasks=5"
+    conf.setNumReduceTasks(5);
     conf.setPartitionerClass(ArtistPartitioner.class);
 
 		// Takes input and output paths
